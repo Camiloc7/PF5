@@ -4,26 +4,25 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { ShoppingCart, Heart, User, Menu, X, Search, Paintbrush, Sun, Moon } from 'lucide-react'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { ShoppingCart, Heart, User, Menu, X, Search, Paintbrush, Sun, Moon, LogOut } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const [isOpen, setIsOpen] = useState(false)
   const [theme, setTheme] = useState('default')
-
-  // Estado para simular si el usuario está autenticado
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  // Cargar el tema desde localStorage
+  const router = useRouter()
+
   useEffect(() => {
+    // Verifica si hay un token en localStorage
+    const token = localStorage.getItem('token')
+    setIsAuthenticated(!!token)
+
     const savedTheme = localStorage.getItem('theme') || 'default'
     setTheme(savedTheme)
-    if (savedTheme === 'alt') {
-      document.documentElement.classList.add('theme-alt')
-    } else {
-      document.documentElement.classList.remove('theme-alt')
-    }
+    document.documentElement.classList.toggle('theme-alt', savedTheme === 'alt')
   }, [])
 
   const toggleTheme = () => {
@@ -31,6 +30,12 @@ const Navbar = () => {
     setTheme(newTheme)
     localStorage.setItem('theme', newTheme)
     document.documentElement.classList.toggle('theme-alt')
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    setIsAuthenticated(false)
+    router.push('/') // Redirigir al home
   }
 
   return (
@@ -60,7 +65,6 @@ const Navbar = () => {
           </div>
 
           <div className="flex items-center space-x-4">
-            {/* Botones de búsqueda */}
             {isSearchOpen ? (
               <div className="flex items-center">
                 <Input
@@ -78,25 +82,26 @@ const Navbar = () => {
               </Button>
             )}
 
-            {/* Icono de carrito siempre visible */}
+            {/* Icono de carrito */}
             <Button variant="ghost" size="icon">
               <ShoppingCart className="h-5 w-5" />
             </Button>
 
-            {/* Si el usuario está autenticado, mostrar los iconos de favoritos y usuario */}
+            {/* Si el usuario está autenticado */}
             {isAuthenticated ? (
               <>
                 <Button variant="ghost" size="icon">
                   <Heart className="h-5 w-5" />
                 </Button>
-
                 <Button variant="ghost" size="icon">
                   <User className="h-5 w-5" />
+                </Button>
+                <Button variant="ghost" size="icon" onClick={handleLogout}>
+                  <LogOut className="h-5 w-5" />
                 </Button>
               </>
             ) : (
               <>
-                {/* Si no está autenticado, mostrar los botones de login y registro */}
                 <Link href="/auth/login" className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
                   Iniciar Sesión
                 </Link>
@@ -128,12 +133,20 @@ const Navbar = () => {
           <Link href="/shop" className="text-dark hover:text-primary">Tienda</Link>
           <Link href="/magazine" className="text-dark hover:text-primary">Magazine</Link>
           <Link href="/community" className="text-dark hover:text-primary">Comunidad</Link>
-          <Link href="/auth/login" className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
-            Iniciar Sesión
-          </Link>
-          <Link href="/auth/register" className="bg-secondary text-white px-4 py-2 rounded-lg hover:bg-primary transition">
-            Registrarse
-          </Link>
+          {isAuthenticated ? (
+            <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+              Cerrar Sesión
+            </button>
+          ) : (
+            <>
+              <Link href="/auth/login" className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition">
+                Iniciar Sesión
+              </Link>
+              <Link href="/auth/register" className="bg-secondary text-white px-4 py-2 rounded-lg hover:bg-primary transition">
+                Registrarse
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>
