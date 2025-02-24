@@ -40,14 +40,14 @@
 // }
 
 
-
 import './globals.css';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ThemeProvider } from "@/components/theme-provider";
-import { ToastProvider } from "@/components/ui/use-toast"; // Asegúrate de importar el ToastProvider
+import { ToastProvider } from "@/components/ui/use-toast"; 
 import Navbar from '@/components/navbar';
 import Footer from '@/components/footer';
+import Chatbot from '@/components/Chatbot'; 
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -70,10 +70,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ToastProvider> {/* Aquí envolvemos el contenido con ToastProvider */}
+          <ToastProvider>
             <div className="flex min-h-screen flex-col">
               <Navbar />
               <main className="flex-grow">{children}</main>
+              <Chatbot /> 
               <Footer />
             </div>
           </ToastProvider>
